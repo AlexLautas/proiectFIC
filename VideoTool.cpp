@@ -1,6 +1,13 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h> 
 //#include <opencv2\highgui.h>
 #include "opencv2/highgui/highgui.hpp"
 //#include <opencv2\cv.h>
@@ -10,7 +17,7 @@ using namespace std;
 using namespace cv;
 //initial min and max HSV filter values.
 //these will be changed using trackbars
-int H_MIN = 0;
+int H_MIN = 156;
 int H_MAX = 256;
 int S_MIN = 0;
 int S_MAX = 256;
@@ -175,10 +182,59 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed) {
 		else putText(cameraFeed, "TOO MUCH NOISE! ADJUST FILTER", Point(0, 50), 1, 2, Scalar(0, 0, 255), 2);
 	}
 }
+void error(const char *msg)
+{
+    perror(msg);
+    exit(0);
+}
+int socket(char m[30])
+{
+    int sockfd, portno, n;
+    struct sockaddr_in serv_addr;
+    struct hostent *server;
+
+    char buffer[256];
+   
+    portno = atoi("20232");
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) 
+        error("ERROR opening socket");
+    server = gethostbyname("193.226.12.217");
+    if (server == NULL) {
+        fprintf(stderr,"ERROR, no such host\n");
+        exit(0);
+    }
+    bzero((char *) &serv_addr, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    bcopy((char *)server->h_addr, 
+         (char *)&serv_addr.sin_addr.s_addr,
+         server->h_length);
+    serv_addr.sin_port = htons(portno);
+    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
+        error("ERROR connecting");
+        int i;
+    for(i=0;i<strlen(m);i++) {
+      if(m[i]=='f' || m[i]=='b' || m[i]=='l' || m[i]=='r' || m[i]=='s') {
+         
+    bzero(buffer,256);
+    sprintf(buffer,"%c",m[i]);
+    n = write(sockfd,buffer,strlen(buffer));
+    if (n < 0) 
+         error("ERROR writing to socket");
+    sleep(1);
+    bzero(buffer,256);
+      }
+      else
+        continue;
+    };
+    close(sockfd);
+    return 0;
+}
 int main(int argc, char* argv[])
 {
-
-	//some boolean variables for different functionality within this
+  char m[30]="flrlrls";
+  socket(m);
+/*	//some boolean variables for different functionality within this
 	//program
 	bool trackObjects = true;
 	bool useMorphOps = true;
@@ -199,7 +255,11 @@ int main(int argc, char* argv[])
 	//video capture object to acquire webcam feed
 	VideoCapture capture;
 	//open capture object at location zero (default location for webcam)
+<<<<<<< HEAD
+	capture.open("rtmp://172.16.254.99/live/nimic");
+=======
 	capture.open("ftmp://17.16.254.99/live/nimic");
+>>>>>>> b40432a8947fdec2e9e50d3c375f6bce863aa74a
 	//set height and width of capture frame
 	capture.set(CV_CAP_PROP_FRAME_WIDTH, FRAME_WIDTH);
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
@@ -244,7 +304,7 @@ int main(int argc, char* argv[])
 		//image will not appear without this waitKey() command
 		waitKey(30);
 	}
-
+*/
 	return 0;
 }
 
