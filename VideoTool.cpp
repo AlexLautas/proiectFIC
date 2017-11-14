@@ -17,11 +17,11 @@ using namespace std;
 using namespace cv;
 //initial min and max HSV filter values.
 //these will be changed using trackbars
-int H_MIN = 156;
-int H_MAX = 256;
-int S_MIN = 0;
-int S_MAX = 256;
-int V_MIN = 0;
+int H_MIN = 0;
+int H_MAX = 48;
+int S_MIN = 88;
+int S_MAX = 166;
+int V_MIN = 252;
 int V_MAX = 256;
 //default capture width and height
 const int FRAME_WIDTH = 640;
@@ -187,7 +187,7 @@ void error(const char *msg)
     perror(msg);
     exit(0);
 }
-int socket(char m[30])
+/*int socket(char m[30])
 {
     int sockfd, portno, n;
     struct sockaddr_in serv_addr;
@@ -229,12 +229,12 @@ int socket(char m[30])
     };
     close(sockfd);
     return 0;
-}
+}*/
 int main(int argc, char* argv[])
 {
-  char m[30]="flrlrls";
-  socket(m);
-/*	//some boolean variables for different functionality within this
+  //char m[30]="flrlrls";
+  //socket(m);
+	//some boolean variables for different functionality within this
 	//program
 	bool trackObjects = true;
 	bool useMorphOps = true;
@@ -255,11 +255,8 @@ int main(int argc, char* argv[])
 	//video capture object to acquire webcam feed
 	VideoCapture capture;
 	//open capture object at location zero (default location for webcam)
-<<<<<<< HEAD
 	capture.open("rtmp://172.16.254.99/live/nimic");
-=======
-	capture.open("ftmp://17.16.254.99/live/nimic");
->>>>>>> b40432a8947fdec2e9e50d3c375f6bce863aa74a
+
 	//set height and width of capture frame
 	capture.set(CV_CAP_PROP_FRAME_WIDTH, FRAME_WIDTH);
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
@@ -274,13 +271,22 @@ int main(int argc, char* argv[])
 
 		//store image to matrix
 		capture.read(cameraFeed);
+   if(cameraFeed.empty()) {
+     exit(1);
+   }
 		//convert frame from BGR to HSV colorspace
 		cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
 		//filter HSV image between values and store filtered image to
 		//threshold matrix
 		//inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
-		inRange(HSV, Scalar(149, S_MIN, V_MIN), Scalar(256, S_MAX, V_MAX), threshold);
-		inRange(HSV, Scalar(27, 55, V_MIN), Scalar(50, S_MAX, V_MAX), threshold2);
+		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+   int H_MIN = 141;
+  int H_MAX = 188;
+  int S_MIN = 65;
+  int S_MAX = 120;
+  int V_MIN = 83;
+  int V_MAX = 256;
+		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold2);
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
 		if (useMorphOps) {
@@ -304,7 +310,7 @@ int main(int argc, char* argv[])
 		//image will not appear without this waitKey() command
 		waitKey(30);
 	}
-*/
+
 	return 0;
 }
 
